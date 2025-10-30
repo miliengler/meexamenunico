@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MEbank Choice – Examen Único</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#ffffff">
+<style>
+body { font-family: 'Inter', sans-serif; background: #fff; color: #111; margin: 0; padding: 0; }
+header { display: flex; align-items: center; gap: 10px; background: #fff; padding: 14px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); position: sticky; top: 0; }
+h1 { font-size: 20px; margin: 0; }
+.logo-heart { width: 26px; height: 26px; }
+main { padding: 20px; max-width: 800px; margin: auto; }
+.question { background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+.option { padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin: 6px 0; cursor: pointer; }
+.option.correct { background: #dcfce7; border-color: #86efac; }
+.option.wrong { background: #fee2e2; border-color: #fca5a5; }
+.explain { font-size: 14px; color: #444; margin-top: 10px; display: none; }
+footer { text-align: center; color: #777; font-size: 12px; padding: 20px; }
+</style>
+</head>
+<body>
+<header>
+<svg class="logo-heart" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 22 C12 12, 28 10, 32 20 C36 10, 52 12, 52 22 C52 36, 38 42, 32 50 C26 42, 12 36, 12 22 Z" stroke="#B91C1C" stroke-width="2" fill="none"/>
+</svg>
+<h1>MEbank Choice – Examen Único</h1>
+</header>
+<main id="app">
+  <div class="question">
+    <div class="stem">Gestante de 12 semanas, ¿qué estudio NO corresponde al primer control?</div>
+    <div class="option" data-correct="false">Grupo y factor Rh</div>
+    <div class="option" data-correct="false">Glucemia en ayunas</div>
+    <div class="option" data-correct="false">VDRL/RPR</div>
+    <div class="option" data-correct="true">Urocultivo de control a las 28 semanas</div>
+    <div class="explain">El urocultivo de control a las 28 semanas no corresponde al primer control; suele pedirse urocultivo en 1er trimestre y repetir según riesgo.</div>
+  </div>
+</main>
+<footer>Hecho con ❤️ · 2025-10-30 22:48</footer>
+<script>
+document.querySelectorAll('.option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const correct = opt.dataset.correct === 'true';
+    opt.classList.add(correct ? 'correct' : 'wrong');
+    opt.parentElement.querySelector('.explain').style.display = 'block';
+  });
+});
+</script>
+</body>
+</html>
