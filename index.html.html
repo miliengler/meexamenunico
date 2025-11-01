@@ -1,53 +1,984 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MEbank Choice – Examen Único</title>
+<title>ME banco de preguntas – Choices Examen Residencia</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#ffffff">
 <style>
-body { font-family: 'Inter', sans-serif; background: #fff; color: #111; margin: 0; padding: 0; }
-header { display: flex; align-items: center; gap: 10px; background: #fff; padding: 14px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); position: sticky; top: 0; }
-h1 { font-size: 20px; margin: 0; }
-.logo-heart { width: 26px; height: 26px; }
-main { padding: 20px; max-width: 800px; margin: auto; }
-.question { background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
-.option { padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; margin: 6px 0; cursor: pointer; }
-.option.correct { background: #dcfce7; border-color: #86efac; }
-.option.wrong { background: #fee2e2; border-color: #fca5a5; }
-.explain { font-size: 14px; color: #444; margin-top: 10px; display: none; }
-footer { text-align: center; color: #777; font-size: 12px; padding: 20px; }
+:root{
+  --bg:#ffffff; --text:#0f172a; --muted:#475569; --soft:#f1f5f9; --line:#e2e8f0; --brand:#2563eb; --brand-dark:#1e40af; --accent:#22c55e; --danger:#ef4444; --card:#ffffff;
+  --option-correct: rgba(34,197,94,.9);
+  --option-wrong:   rgba(239,68,68,.9);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  background:var(--bg);color:var(--text);
+  animation:fadeIn .5s ease;
+  transition: background-color .25s ease, color .25s ease;
+}
+a{color:inherit;text-decoration:none}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+button{cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:14px 20px;font-size:16px;font-weight:500;transition:.2s background,.2s transform}
+button:hover{transform:translateY(-2px)}
+.btn-main{background:var(--brand);color:#fff;width:100%;max-width:360px;margin:8px auto;display:block;text-align:center;border-color:var(--brand)}
+.btn-main:hover{background:var(--brand-dark)}
+.btn-small{padding:10px 14px;font-size:14px}
+.hidden{display:none}
+
+.header{position:sticky;top:0;z-index:10;background:var(--card);box-shadow:0 6px 24px rgba(2,6,23,.08)}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.brand{display:flex;align-items:center;gap:12px;justify-content:center;padding:14px 0}
+.brand h1{margin:0;font-size:clamp(20px,3vw,26px);font-weight:700;color:var(--brand-dark)}
+
+.footer{text-align:center;color:var(--muted);font-size:14px;padding:20px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 6px 24px rgba(2,6,23,.08)}
+.accordion{list-style:none;margin:0;padding:0;max-width:760px;margin:auto}
+.acc-item{border-bottom:1px solid var(--line);padding:10px 4px}
+.acc-header{display:flex;flex-direction:column;cursor:pointer}
+.acc-title{font-weight:600;font-size:16px}
+.acc-count{font-size:12px;color:var(--muted);margin-top:4px}
+.acc-content{padding:10px 0 14px 24px;display:none}
+.acc-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+input[type="number"]{background:#fff;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:110px}
+
+.options{margin-top:12px;display:grid;gap:10px}
+.option{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:flex-start;background:var(--card);cursor:pointer;transition:.15s border-color,.15s box-shadow}
+.option.correct{border-color:var(--option-correct);box-shadow:inset 0 0 0 1px rgba(34,197,94,.35)}
+.option.wrong{border-color:var(--option-wrong);box-shadow:inset 0 0 0 1px rgba(239,68,68,.35)}
+.explain{margin-top:12px;color:var(--muted);font-size:14px;white-space:pre-wrap}
+.nav-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* Layout pregunta + sidebar índice */
+.q-layout{display:grid;grid-template-columns: 1fr 220px; gap:18px; align-items:start}
+@media(max-width:900px){ .q-layout{grid-template-columns:1fr} }
+
+/* Sidebar índice */
+.sidebar{
+  position:sticky; top:82px; align-self:start;
+  border:1px solid var(--line); background:var(--card); border-radius:14px; padding:12px;
+  box-shadow:0 6px 24px rgba(2,6,23,.08); transition: transform .2s ease, opacity .2s ease;
+}
+.side-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.side-title{font-weight:600;font-size:14px}
+.side-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.side-btn{
+  border:1px solid var(--line); background:var(--soft); border-radius:8px; padding:8px;
+  font-size:12px; text-align:center; cursor:pointer; user-select:none;
+}
+.side-btn.ok{ background:rgba(34,197,94,.25); border-color:#22c55e; color:#22c55e; }
+.side-btn.bad{ background:rgba(239,68,68,.25); border-color:#ef4444; color:#ef4444; }
+.side-btn.cur{ outline:2px solid var(--brand); background:rgba(37,99,235,.15); }
+.side-toggle{border-radius:10px; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center}
+.sidebar.closed{ transform: translateX(14px); opacity:.0; pointer-events:none }
+
+/* Modo oscuro suave */
+body[data-theme="dark"]{
+  --bg:#1e293b; --text:#e2e8f0; --muted:#cbd5e1; --soft:#0f172a; --line:#334155; --card:#0b1624;
+  --brand:#6ea8ff; --brand-dark:#4a7fd6;
+  --option-correct: rgba(34,197,94,.9);
+  --option-wrong:   rgba(239,68,68,.9);
+}
+
+/* Toggle tema */
+.theme-toggle{
+  position:fixed; right:16px; bottom:16px; z-index:50;
+  width:46px; height:46px; border-radius:999px; background:var(--brand); color:#fff; border:1px solid var(--brand);
+  display:flex; align-items:center; justify-content:center; box-shadow:0 6px 24px rgba(2,6,23,.18);
+}
+.theme-toggle:hover{ background:var(--brand-dark) }
+  
+/* Cronómetro flotante */
+.timer-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 72px; /* un poco arriba del botón 🌙 */
+  z-index: 50;
+  width: 110px;
+  height: 46px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  border: 1px solid var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 6px 24px rgba(2,6,23,.18);
+  transition: background 0.2s ease;
+}
+.timer-toggle:hover {
+  background: var(--brand-dark);
+}
+  
+/* Checkboxes en “Creá tu examen” */
+.chk-mat input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-right: 6px;
+}
 </style>
 </head>
+
 <body>
-<header>
-<svg class="logo-heart" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 22 C12 12, 28 10, 32 20 C36 10, 52 12, 52 22 C52 36, 38 42, 32 50 C26 42, 12 36, 12 22 Z" stroke="#B91C1C" stroke-width="2" fill="none"/>
-</svg>
-<h1>MEbank Choice – Examen Único</h1>
-</header>
-<main id="app">
-  <div class="question">
-    <div class="stem">Gestante de 12 semanas, ¿qué estudio NO corresponde al primer control?</div>
-    <div class="option" data-correct="false">Grupo y factor Rh</div>
-    <div class="option" data-correct="false">Glucemia en ayunas</div>
-    <div class="option" data-correct="false">VDRL/RPR</div>
-    <div class="option" data-correct="true">Urocultivo de control a las 28 semanas</div>
-    <div class="explain">El urocultivo de control a las 28 semanas no corresponde al primer control; suele pedirse urocultivo en 1er trimestre y repetir según riesgo.</div>
+  <div class="header">
+    <div class="wrap brand">
+      <svg width="26" height="26" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo">
+        <path d="M12 22 C12 12, 28 10, 32 20 C36 10, 52 12, 52 22 C52 36, 38 42, 32 50 C26 42, 12 36, 12 22 Z" stroke="#B91C1C" stroke-width="2" fill="none" />
+      </svg>
+      <h1>ME banco de preguntas – Choices Examen Residencia</h1>
+    </div>
   </div>
-</main>
-<footer>Hecho con ❤️ · 2025-10-30 22:48</footer>
+
+  <main class="wrap" id="app"></main>
+
+  <div class="footer">Vos podés ❤️</div>
+
+  <button id="themeBtn" class="theme-toggle" title="Cambiar tema">🌙</button>
+
 <script>
-document.querySelectorAll('.option').forEach(opt => {
-  opt.addEventListener('click', () => {
-    const correct = opt.dataset.correct === 'true';
-    opt.classList.add(correct ? 'correct' : 'wrong');
-    opt.parentElement.querySelector('.explain').style.display = 'block';
+/* ---------- Persistencia ---------- */
+const LS_BANK="mebank_bank_v6_2", LS_PROGRESS="mebank_prog_v6_2", LS_THEME="mebank_theme", LS_ADMIN="mebank_admin_hash_v6_2";
+
+let BANK = JSON.parse(localStorage.getItem(LS_BANK)||"null") || {
+  subjects: [
+  {slug:"neumonologia", name:`${String.fromCodePoint(0x1FAC1)} Neumonología`},          // 🫁
+  {slug:"psiquiatria", name:`${String.fromCodePoint(0x1F9D0)} Psiquiatría`},            // 🧠💭 → solo 🤔 (globo de pensar)
+  {slug:"cardiologia", name:`${String.fromCodePoint(0x1FAC0)} Cardiología`},            // 🫀
+  {slug:"nutricion", name:`${String.fromCodePoint(0x1F34F)} Nutrición`},                // 🍏
+  {slug:"nefrologia", name:`${String.fromCodePoint(0x1FAD8)} Nefrología`},              // 🫘
+  {slug:"gastroenterologia", name:`${String.fromCodePoint(0x1F4A9)} Gastroenterología`}, // 💩
+  {slug:"dermatologia", name:`${String.fromCodePoint(0x1F9F4)} Dermatología`},          // 🧴
+  {slug:"infectologia", name:`${String.fromCodePoint(0x1F9A0)} Infectología`},          // 🦠
+  {slug:"reumatologia", name:`${String.fromCodePoint(0x1F4AA)} Reumatología`},          // 💪
+  {slug:"hematologia", name:`${String.fromCodePoint(0x1FA78)} Hematología`},            // 🩸
+  {slug:"neurologia", name:`${String.fromCodePoint(0x1F9E0)} Neurología`},              // 🧠
+  {slug:"endocrinologia", name:`${String.fromCodePoint(0x1F9EA)} Endocrinología`},      // 🧪
+  {slug:"pediatria", name:`${String.fromCodePoint(0x1F9F8)} Pediatría`},                // 🧸
+  {slug:"oncologia", name:`${String.fromCodePoint(0x1F397)} Oncología`},                // 🎗️
+  {slug:"medicinafamiliar", name:`${String.fromCodePoint(0x1F46A)} Medicina Familiar`},  // 👨‍👩‍👧‍👦
+  {slug:"ginecologia", name:`${String.fromCodePoint(0x1F33A)} Ginecología`},            // 🌸
+  {slug:"obstetricia", name:`${String.fromCodePoint(0x1F930)} Obstetricia`},            // 🤰
+  {slug:"cirugiageneral", name:`${String.fromCodePoint(0x1F52A)} Cirugía General`},     // 🔪
+  {slug:"traumatologia", name:`${String.fromCodePoint(0x1F9B4)} Traumatología`},        // 🦴
+  {slug:"urologia", name:`${String.fromCodePoint(0x1F6BD)} Urología`},                  // 🚽
+  {slug:"oftalmologia", name:`${String.fromCodePoint(0x1F441)} Oftalmología`},          // 👁️
+  {slug:"otorrinolaringologia", name:`${String.fromCodePoint(0x1F442)} Otorrinolaringología`}, // 👂
+  {slug:"neurocirugia", name:`${String.fromCodePoint(0x1F9E0)} Neurocirugía`},          // 🧠
+  {slug:"toxicologia", name:`${String.fromCodePoint(0x2620)} Toxicología`},             // ☠️
+  {slug:"saludpublica", name:`${String.fromCodePoint(0x1F3E5)} Salud Pública`},         // 🏥
+  {slug:"medicinalegal", name:`${String.fromCodePoint(0x2696)} Medicina Legal`},        // ⚖️
+  {slug:"imagenes", name:`${String.fromCodePoint(0x1FA7B)} Diagnóstico por Imágenes`},  // 🩻
+  {slug:"otras", name:`${String.fromCodePoint(0x1F4DA)} Otras`}                        // 📚
+  ],
+  questions:[
+    {id:"OB-001",materia:"obstetricia",subtema:"Controles prenatales",enunciado:"Gestante 12 semanas, ¿qué estudio no corresponde al primer control?",opciones:["Grupo y factor Rh","Glucemia","VDRL","Urocultivo 28 sem"],correcta:3,explicacion:"El urocultivo a las 28 semanas no es del primer control."},
+    {id:"PE-001",materia:"pediatria",subtema:"Bronquiolitis",enunciado:"Lactante con bronquiolitis leve, manejo:",opciones:["Broncodilatador","Corticoides","Oxígeno según SatO2","Antibióticos"],correcta:2,explicacion:"Soporte con oxígeno si SatO2 baja."},
+    {id:"IN-001",materia:"infectologia",subtema:"Faringitis",enunciado:"Test rápido positivo para estreptococo. Conducta:",opciones:["Macrólido empírico","Amoxicilina 10 días","Ceftriaxona IM","No tratar"],correcta:1,explicacion:"Penicilina/Amoxi 10 días es primera línea."}
+  ]
+};
+const PROG=JSON.parse(localStorage.getItem(LS_PROGRESS)||"{}"); // {materia:{qid:{chosen,status}, _lastIndex:number}, general:{...}}
+function saveAll(){ localStorage.setItem(LS_BANK,JSON.stringify(BANK)); localStorage.setItem(LS_PROGRESS,JSON.stringify(PROG)); }
+
+/* ---------- Tema ---------- */
+(function initTheme(){
+  const saved = localStorage.getItem(LS_THEME) || "light";
+  document.body.setAttribute("data-theme", saved);
+  document.getElementById("themeBtn").textContent = saved==="dark" ? "☀️" : "🌙";
+})();
+document.getElementById("themeBtn").onclick = ()=>{
+  const cur = document.body.getAttribute("data-theme")==="dark" ? "light":"dark";
+  document.body.setAttribute("data-theme", cur);
+  localStorage.setItem(LS_THEME, cur);
+  document.getElementById("themeBtn").textContent = cur==="dark" ? "☀️" : "🌙";
+};
+
+/* ---------- Admin por URL (?admin=1) ---------- */
+const adminActive = new URLSearchParams(location.search).get('admin') === '1';
+let gear, btnImport, owWrap, overwrite, fileInput;
+function setupAdminControls(){
+  if(!adminActive) return;
+  const panel = document.createElement('div');
+  panel.className = 'card';
+  panel.style = 'position:fixed; right:16px; top:76px; z-index:40; width:280px';
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <b>Modo admin</b>
+      <button id="admGear" class="btn-small" title="PIN">⚙️</button>
+    </div>
+    <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+      <button id="btnImport" class="btn-small">Importar</button>
+      <label id="owWrap" class="btn-small" style="display:none"><input type="checkbox" id="overwrite"> Sobrescribir</label>
+      <input id="fileInput" type="file" accept="application/json" class="hidden"/>
+    </div>`;
+  document.body.appendChild(panel);
+  gear = document.getElementById('admGear');
+  btnImport = document.getElementById('btnImport');
+  owWrap = document.getElementById('owWrap');
+  overwrite = document.getElementById('overwrite');
+  fileInput = document.getElementById('fileInput');
+  hookAdmin();
+}
+setupAdminControls();
+
+async function sha256Hex(str){
+  const enc = new TextEncoder().encode(str);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ---------- Utilidades ---------- */
+function subjectsFromBank(){
+  const known = new Map((BANK.subjects||[]).map(s=>[s.slug,s]));
+  (BANK.questions||[]).forEach(q=>{
+    if(q && q.materia && !known.has(q.materia)){
+      known.set(q.materia,{slug:q.materia,name:q.materia[0].toUpperCase()+q.materia.slice(1)});
+    }
   });
-});
+  return Array.from(known.values()).sort((a,b)=>a.name.localeCompare(b.name));
+}
+const app=document.getElementById("app");
+
+/* ---------- HOME ---------- */
+
+  
+  function renderHome(){
+  clearExamTimer(); // Apaga cronómetro si estaba activo
+
+  app.innerHTML = `
+    <div style="text-align:center;animation:fadeIn .5s;display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <button class="btn-main" onclick="renderSubjects()">${String.fromCodePoint(0x1F9E9)} Choice por materia</button>
+      <button class="btn-main" onclick="renderOld()">${String.fromCodePoint(0x1F4C4)} Exámenes anteriores</button>
+      <button class="btn-main" style="background:#1e40af;border-color:#1e40af;" onclick="renderExamenGeneralSetup()">${String.fromCodePoint(0x1F9E0)} Modo Examen – Creá el tuyo</button>
+      <button class="btn-main" style="background:#1e40af;border-color:#1e40af;" onclick="renderStatsGlobal()">${String.fromCodePoint(0x1F4CA)} Estadísticas generales</button>
+      <button class="btn-main" onclick="renderNotesList()">${String.fromCodePoint(0x1F4D4)} Mis notas</button>
+      <!-- 🔹 Botón temporal para resetear el banco -->
+      <button class="btn-main" style="background:#64748b;border-color:#64748b;" onclick="resetBanco()">
+        🧹 Reset banco (temporal)
+      </button>
+    </div>
+  `;
+}
+
+function resetBanco(){
+  if(confirm("¿Querés borrar el banco actual y recargar las materias nuevas?")){
+    localStorage.removeItem("mebank_bank_v6_2");
+    localStorage.removeItem("mebank_prog_v6_2");
+    location.reload();
+  }
+}
+  console.log("✅ Script llegó hasta renderHome()");
+alert("✅ Script llegó hasta renderHome()");
+renderHome();
+
+function renderOld(){
+  app.innerHTML=`<div class="card" style="text-align:center">📄 Próximamente.<br><br><button class='btn-main' onclick='renderHome()'>Volver</button></div>`;
+}
+
+/* ---------- SUBJECTS (acordeón) ---------- */
+function renderSubjects(){
+  const subs = subjectsFromBank().sort((a, b) => 
+  a.name.replace(/[^\p{L}\p{N} ]/gu, '').localeCompare(
+    b.name.replace(/[^\p{L}\p{N} ]/gu, ''), 'es', {sensitivity:'base'}
+  )
+);
+  const backBtn = `<button class='btn-small' onclick='renderHome()'>⬅️ Volver al inicio</button>`;
+  const list=subs.map(s=>{
+    const count=BANK.questions.filter(q=>q.materia===s.slug).length;
+    const last = (PROG[s.slug] && PROG[s.slug]._lastIndex!=null) ? (PROG[s.slug]._lastIndex+1) : null;
+    const reanudarBtn = last? `<button class='btn-small' onclick='resume("${s.slug}")'>Reanudar (${last})</button>` : ``;
+    return `<li class='acc-item'>
+      <div class='acc-header' onclick='toggleAcc("${s.slug}")'>
+        <div class='acc-title'>${s.name}</div>
+        <div class='acc-count hidden' id='count-${s.slug}'>${count} preguntas cargadas</div>
+      </div>
+      <div class='acc-content' id='acc-${s.slug}'>
+        <div class='acc-actions'>
+          <label class='small'>Desde # <input type='number' id='start-${s.slug}' min='1' value='1'></label>
+          <button class='btn-small' onclick='startPractica("${s.slug}")'>Práctica</button>
+          <button class='btn-small' onclick='startRepaso("${s.slug}")'>Repaso</button>
+          <button class='btn-small' onclick='showStats("${s.slug}")'>Estadísticas</button>
+          ${reanudarBtn}
+          <button class='btn-small' onclick='renderHome()'>Inicio</button>
+        </div>
+      </div>
+    </li>`;
+  }).join("");
+  app.innerHTML=`
+  <div class='card'>
+    ${backBtn}
+    <ul class='accordion'>${list}</ul>
+  </div>`;
+}
+window.toggleAcc=(slug)=>{
+  const el=document.getElementById(`acc-${slug}`);const cnt=document.getElementById(`count-${slug}`);
+  const open=el.style.display==="block";document.querySelectorAll(".acc-content").forEach(e=>e.style.display="none");
+  document.querySelectorAll(".acc-count").forEach(c=>c.classList.add("hidden"));
+  if(!open){el.style.display="block";cnt.classList.remove("hidden");}
+};
+
+/* ---------- Helpers ---------- */
+function getStart(slug,total){
+  const el = document.getElementById(`start-${slug}`);
+  let v = parseInt((el && el.value) ? el.value : "1", 10);
+  if(isNaN(v) || v<1) v = 1;
+  if(v>total) v = total;
+  return v;
+}
+
+/* ---------- Motor preguntas + sidebar índice ---------- */
+let CURRENT={list:[],i:0,materia:"", session:{}};
+
+function resume(slug){
+  const last = (PROG[slug] && PROG[slug]._lastIndex!=null) ? PROG[slug]._lastIndex : 0;
+  const listAll = BANK.questions.filter(q=>q.materia===slug).sort((a,b)=>a.id.localeCompare(b.id));
+  if(!listAll.length){ alert("No hay preguntas en esta materia."); return; }
+  CURRENT = { list:listAll, i:Math.min(last, listAll.length-1), materia:slug, session:{} };
+  renderQuestionWithSidebar(true);
+}
+
+function startPractica(slug){
+  const listAll = BANK.questions.filter(q=>q.materia===slug).sort((a,b)=>a.id.localeCompare(b.id));
+  if(!listAll.length){ app.innerHTML = `<div class="card">No hay preguntas en <b>${slug}</b>. Importá un banco en modo admin.</div>`; return; }
+  const start = getStart(slug, listAll.length);
+  CURRENT = { list:listAll.slice(start-1), i:0, materia:slug, session:{} };
+  PROG[slug] = PROG[slug] || {};
+  PROG[slug]._lastIndex = 0;
+  saveAll();
+  renderQuestionWithSidebar(true);
+}
+
+function startRepaso(slug){
+  const listAll = BANK.questions.filter(q=>q.materia===slug).sort((a,b)=>a.id.localeCompare(b.id));
+  const prog = PROG[slug]||{};
+  const list = listAll.filter(q=> prog[q.id]?.status==='bad');
+  if(!list.length){ app.innerHTML = `<div class='card'>No tenés incorrectas para repasar en <b>${slug}</b>.<br><br><button class='btn-main' onclick='renderSubjects()'>Volver</button></div>`; return; }
+  CURRENT = { list, i:0, materia:slug, session:{} };
+  renderQuestionWithSidebar(true);
+}
+
+function renderGeneral(){
+  // Entra al configurador de “Creá tu examen”
+  renderExamenGeneralSetup();
+}
+
+/* ---------- Render de pregunta + sidebar ---------- */
+function renderQuestionWithSidebar(open=true){
+  const q = CURRENT.list[CURRENT.i];
+  if(!q){ 
+    app.innerHTML=`<div class='card fade'>Sin preguntas.<br><button class='btn-main' onclick='renderHome()'>Volver</button></div>`; 
+    return; 
+  }
+
+  const prog = PROG[CURRENT.materia]||{};
+  const ans = prog[q.id]?.chosen;
+
+  const opts = q.opciones.map((t,i)=>{
+    let cls='';
+    if(ans!=null){
+      if(i===q.correcta) cls='correct';
+      else if(i===ans) cls='wrong';
+    }
+    return `<label class='option ${cls}' onclick='answer(${i})'><input type='radio' name='opt'> ${String.fromCharCode(97+i)}) ${t}</label>`;
+  }).join('');
+
+  const exp = (ans!=null)? `<div class='explain'>${q.explicacion||''}</div>` : '';
+  
+
+  const states = CURRENT.list.map(qq=>{
+    const st = prog[qq.id]?.status;
+    return st==='ok' ? 'ok' : st==='bad' ? 'bad' : 'none';
+  });
+  
+  const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
+const sideBtns = states.map((st,ix)=>{
+  const qq = CURRENT.list[ix];
+  const hasNote = !!NOTES[qq.id];
+  const cls = (st==='ok'?'ok': st==='bad'?'bad':'');
+  const cur = (ix===CURRENT.i) ? 'cur' : '';
+  const icon = hasNote ? '📎' : '';
+  return `<button class="side-btn ${cls} ${cur}" onclick="jump(${ix})">${ix+1}${icon}</button>`;
+}).join('');
+  const notaGuardada = JSON.parse(localStorage.getItem("mebank_notes") || "{}")[q.id]?.text || "";
+const showNotes = ans != null; // solo mostrar si ya respondió
+
+
+  
+const side = `
+  <div id="sidebar" class="sidebar ${open ? '' : 'closed'}">
+    <div class="side-header">
+      <div class="side-title">Índice</div>
+      <button class="side-toggle" title="Mostrar/ocultar índice" onclick="toggleSidebar()">📑</button>
+    </div>
+
+    <div class="small" style="margin:4px 0 6px;text-align:center;">
+      Progreso: ${CURRENT.i + 1} de ${CURRENT.list.length} (${Math.round((CURRENT.i + 1) * 100 / CURRENT.list.length)}%)
+    </div>
+
+    <div class="side-grid">${sideBtns}</div>
+
+    ${showNotes ? `
+      <hr style="margin:10px 0;">
+      <div class="notes-panel" style="margin-top:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <b style="font-size:13px;color:var(--brand-dark)">📝 Nota personal</b>
+          <button class="btn-small" style="font-size:12px;padding:4px 8px;" onclick="toggleSideNote('${q.id}')">
+            ${notaGuardada ? '✏️ Editar' : '📝 Agregar'}
+          </button>
+        </div>
+
+        <div id="sideNoteArea-${q.id}" class="hidden">
+          <textarea id="sideNoteText-${q.id}" rows="3" style="width:100%;border:1px solid var(--line);border-radius:8px;padding:6px;font-family:inherit;">${notaGuardada}</textarea>
+          <button class="btn-small" style="margin-top:6px;width:100%;" onclick="saveSideNote('${q.id}')">Guardar</button>
+          ${notaGuardada ? `<button class="btn-small" style="margin-top:6px;width:100%;background:#ef4444;color:#fff;border-color:#ef4444" onclick="deleteSideNote('${q.id}')">🗑️ Borrar nota</button>` : ''}
+        </div>
+
+        ${notaGuardada ? `<div id="sideNoteDisplay-${q.id}" style="background:var(--soft);padding:8px;border-radius:8px;font-size:13px;color:var(--muted);white-space:pre-wrap;">${notaGuardada}</div>` : ''}
+      </div>
+    ` : ''}
+  </div>`;
+  
+  app.innerHTML = `
+    <div class="q-layout fade">
+      <div>
+        <div class='card fade'>
+          <div><b>${CURRENT.materia.toUpperCase()}</b> · ${CURRENT.i+1}/${CURRENT.list.length}</div>
+          <div style='margin-top:8px;font-size:18px'>${q.enunciado}</div>
+          <div class='options'>${opts}</div>
+          ${exp}
+          <div class='nav-row'>
+            <button class='btn-small' onclick='prevQ()'>Anterior</button>
+            <button class='btn-small' onclick='nextQ()'>Siguiente</button>
+            <button class='btn-small' onclick='renderHome()'>Inicio</button>
+          </div>
+        </div>
+      </div>
+      ${side}
+    </div>`;
+}
+
+window.toggleSidebar = ()=>{
+  const el = document.getElementById('sidebar');
+  if(!el) return;
+  const closed = el.classList.toggle('closed');
+  let arrow = document.getElementById('sideArrow');
+  if (closed) {
+    if (!arrow) {
+      arrow = document.createElement('button');
+      arrow.id = 'sideArrow';
+      arrow.textContent = '⮜';
+      arrow.title = 'Mostrar índice';
+      Object.assign(arrow.style, {
+        position:'fixed', right:'0', top:'50%', transform:'translateY(-50%)',
+        border:'1px solid var(--line)', borderRadius:'8px 0 0 8px',
+        background:'var(--brand)', color:'#fff', padding:'8px', zIndex:'60', cursor:'pointer'
+      });
+      arrow.onclick = ()=>{ el.classList.remove('closed'); arrow.remove(); };
+      document.body.appendChild(arrow);
+    }
+  } else if (arrow) {
+    arrow.remove();
+  }
+};
+
+window.jump = (ix)=>{ CURRENT.i = ix; updateLastIndex(); renderQuestionWithSidebar(!document.getElementById('sidebar')?.classList.contains('closed')); };
+function prevQ(){ if(CURRENT.i>0){ CURRENT.i--; updateLastIndex(); renderQuestionWithSidebar(!document.getElementById('sidebar')?.classList.contains('closed')); } }
+function nextQ(){ if(CURRENT.i<CURRENT.list.length-1){ CURRENT.i++; updateLastIndex(); renderQuestionWithSidebar(!document.getElementById('sidebar')?.classList.contains('closed')); } }
+
+function updateLastIndex(){
+  if(CURRENT.materia && CURRENT.materia!=="general"){
+    PROG[CURRENT.materia] = PROG[CURRENT.materia] || {};
+    PROG[CURRENT.materia]._lastIndex = Math.max(PROG[CURRENT.materia]._lastIndex ?? 0, CURRENT.i);
+    saveAll();
+  }
+}
+// ---------- Notas en barra lateral ----------
+window.toggleSideNote = (qid) => {
+  const area = document.getElementById(`sideNoteArea-${qid}`);
+  const disp = document.getElementById(`sideNoteDisplay-${qid}`);
+  if (!area) return;
+  const visible = !area.classList.contains("hidden");
+  if (visible) {
+    area.classList.add("hidden");
+    if (disp) disp.style.display = "";
+  } else {
+    area.classList.remove("hidden");
+    if (disp) disp.style.display = "none";
+  }
+};
+
+window.saveSideNote = (qid) => {
+  const txt = document.getElementById(`sideNoteText-${qid}`)?.value.trim();
+  const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
+  if (txt) {
+    NOTES[qid] = { text: txt, date: new Date().toISOString() };
+  } else {
+    delete NOTES[qid];
+  }
+  localStorage.setItem("mebank_notes", JSON.stringify(NOTES));
+  renderQuestionWithSidebar(!document.getElementById('sidebar')?.classList.contains('closed'));
+};
+  window.deleteSideNote = (qid) => {
+  if(!confirm("¿Eliminar esta nota?")) return;
+  const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
+  delete NOTES[qid];
+  localStorage.setItem("mebank_notes", JSON.stringify(NOTES));
+  renderQuestionWithSidebar(!document.getElementById('sidebar')?.classList.contains('closed'));
+};
+function answer(i){
+  const q=CURRENT.list[CURRENT.i];
+  const materiaKey = CURRENT.materia || 'general';
+  PROG[materiaKey]=PROG[materiaKey]||{};
+  if(PROG[materiaKey][q.id]) return; // no permitir cambiar una vez respondida
+  PROG[materiaKey][q.id]={chosen:i,status:(i===q.correcta?'ok':'bad')};
+  if(materiaKey!=='general'){
+    PROG[materiaKey]._lastIndex = CURRENT.i;
+  }
+  saveAll();
+  recordDailyActivity(i === q.correcta);
+  renderQuestionWithSidebar(!document.getElementById('sidebar')?.classList.contains('closed'));
+}
+
+/* ---------- Estadísticas ---------- */
+function showStats(slug){
+  const total=BANK.questions.filter(q=>q.materia===slug).length;
+  const vals=Object.values(PROG[slug]||{}).filter(x=>x && typeof x==='object' && 'status' in x);
+  const ok=vals.filter(v=>v.status==='ok').length;
+  const bad=vals.filter(v=>v.status==='bad').length;
+  app.innerHTML=`<div class='card'><h3>${slug.toUpperCase()}</h3>
+    <p>Total: ${total}</p>
+    <p style='color:#16a34a'>✔ ${ok}</p>
+    <p style='color:#ef4444'>✖ ${bad}</p>
+    <div class='nav-row'>
+      <button class='btn-small' onclick='renderSubjects()'>Volver</button>
+      <button class='btn-small' onclick='resetStats("${slug}")'>Reestablecer</button>
+    </div>
+  </div>`;
+}
+function resetStats(slug){
+  if(confirm(`¿Borrar estadísticas de ${slug}?`)){
+    delete PROG[slug]; saveAll(); alert("Reiniciado");
+    showStats(slug);
+  }
+}
+
+ /* ---------- Estadísticas globales con resumen semanal ---------- */
+
+
+/* --- Guardar actividad diaria (solo correctas) --- */
+function recordDailyActivity(isCorrect = false){
+  const key = new Date().toISOString().slice(0,10);
+  const STATS_DAILY = JSON.parse(localStorage.getItem("mebank_stats_daily") || "{}");
+  if(isCorrect){
+    STATS_DAILY[key] = (STATS_DAILY[key] || 0) + 1;
+    localStorage.setItem("mebank_stats_daily", JSON.stringify(STATS_DAILY));
+  }
+}
+
+/* --- Reset de estadísticas globales --- */
+function resetGlobalStats(){
+  if(confirm("¿Borrar TODAS las estadísticas globales? (No afectará tus materias)")){
+    localStorage.removeItem("mebank_stats_daily");
+    alert("Estadísticas globales reiniciadas ✅");
+    renderStatsGlobal();
+  }
+}
+
+/* --- Reescribir renderStatsGlobal() para mostrar sólo correctas --- */
+function renderStatsGlobal(){
+  const subs = subjectsFromBank();
+  let total = 0, ok = 0, bad = 0;
+
+  subs.forEach(m => {
+    total += BANK.questions.filter(q=>q.materia===m.slug).length;
+    const vals = Object.values(PROG[m.slug]||{}).filter(x => x && typeof x==='object' && 'status' in x);
+    ok += vals.filter(v=>v.status==='ok').length;
+    bad += vals.filter(v=>v.status==='bad').length;
+  });
+
+  const totalResp = ok + bad;
+  const porc = totalResp ? Math.round(ok*100/totalResp) : 0;
+
+  // ---- Actividad semanal ----
+  const STATS_DAILY = JSON.parse(localStorage.getItem("mebank_stats_daily") || "{}");
+  const today = new Date();
+  const days = Array.from({length:7}).map((_,i)=>{
+    const d = new Date(today); d.setDate(today.getDate()-i);
+    const key = d.toISOString().slice(0,10);
+    return {date: key, count: STATS_DAILY[key] || 0};
+  }).reverse();
+
+  const weekList = days.map(d=>{
+    const dd = d.date.slice(8,10);
+    const mm = d.date.slice(5,7);
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:3px 0;">
+        <span style="color:var(--muted)">➤ ${dd}/${mm}</span>
+        <span><b style="color:#16a34a">${d.count}</b> correctas ✅</span>
+      </div>`;
+  }).join("");
+
+  // ---- Sugerencia de práctica ----
+  let suggestion = "";
+  const now = Date.now();
+  let oldest = null;
+  subs.forEach(m=>{
+    const last = PROG[m.slug]?._lastDate;
+    if(last && (!oldest || last<oldest.time)) oldest = {materia:m.name,time:last};
+  });
+  if(oldest){
+    const diffDays = Math.floor((now - oldest.time)/(1000*60*60*24));
+    if(diffDays>2) suggestion = `💡 Hace ${diffDays} días que no practicás <b>${oldest.materia}</b>. ¡Podrías repasar esa!`;
+  } else {
+    suggestion = "💡 Aún no hay datos suficientes para sugerencias.";
+  }
+
+  // ---- Render final ----
+  app.innerHTML = `
+    <div class='card fade' style='text-align:center'>
+      <h3>📊 Estadísticas generales</h3>
+      <p><b>Total de preguntas:</b> ${total}</p>
+      <p style='color:#16a34a'>✔ Correctas: ${ok}</p>
+      <p style='color:#ef4444'>✖ Incorrectas: ${bad}</p>
+      <p><b>Precisión global:</b> ${porc}%</p>
+      <hr style='margin:18px 0'>
+      <h4>📆 Actividad semanal (solo correctas)</h4>
+      <div style='text-align:left;max-width:350px;margin:auto;font-size:14px;'>${weekList}</div>
+      <hr style='margin:18px 0'>
+      <div style='color:var(--brand-dark);font-size:15px;margin-bottom:10px;'>${suggestion}</div>
+      <div class='nav-row' style='justify-content:center'>
+        <button class='btn-small' onclick='resetGlobalStats()'>Reiniciar global</button>
+        <button class='btn-small' onclick='renderHome()'>Volver</button>
+      </div>
+    </div>
+  `;
+}
+/* ---------- Admin (PIN + importar JSON) ---------- */
+function hookAdmin(){
+  if(!adminActive) return;
+  gear.onclick = async ()=>{
+    const saved = localStorage.getItem(LS_ADMIN);
+    if(!saved){
+      const p1 = prompt("Configurá tu PIN (4–10 dígitos/letras):"); if(!p1) return;
+      const p2 = prompt("Repetí el PIN:"); if(p1!==p2){ alert("No coinciden."); return; }
+      localStorage.setItem(LS_ADMIN, await sha256Hex(p1));
+      alert("PIN guardado ✅");
+    }else{
+      const pin = prompt("Ingresá tu PIN:"); if(!pin) return;
+      const ok = (await sha256Hex(pin))===saved; if(!ok){ alert("PIN incorrecto"); return; }
+    }
+    [btnImport, owWrap].forEach(el=>{el.style.display='';});
+    alert("Modo edición activado ✅");
+  };
+  btnImport.onclick = ()=> fileInput.click();
+  fileInput.addEventListener('change', async (e)=>{
+    const f = e.target.files[0]; if(!f) return;
+    try{
+      const text = await f.text();
+      const data = JSON.parse(text);
+      const arr = Array.isArray(data)? data : (data.questions||[]);
+      if(!Array.isArray(arr) || !arr.length) throw new Error("JSON inválido: se esperaba un array de preguntas o {questions:[...]}");
+      const errors=[];
+      arr.forEach((q,i)=>{
+        if(!q.id) errors.push(`Item ${i}: falta 'id'`);
+        if(!q.materia) errors.push(`Item ${i}: falta 'materia'`);
+        if(!Array.isArray(q.opciones)||q.opciones.length!==4) errors.push(`Item ${i}: 'opciones' debe tener 4 strings`);
+        if(typeof q.correcta!=='number' || q.correcta<0 || q.correcta>3) errors.push(`Item ${i}: 'correcta' debe ser 0..3`);
+      });
+      if(errors.length){ alert("Errores:\n"+errors.slice(0,12).join("\n")); return; }
+
+      // Merge materias visibles
+      const subMap = new Map(subjectsFromBank().map(s=>[s.slug,s]));
+      arr.forEach(q=>{ if(!subMap.has(q.materia)) subMap.set(q.materia,{slug:q.materia,name:q.materia[0].toUpperCase()+q.materia.slice(1)}); });
+      BANK.subjects = Array.from(subMap.values());
+
+      // Merge preguntas (con overwrite opcional)
+      const byId = new Map((BANK.questions||[]).map(q=>[q.id,q]));
+      arr.forEach(q=>{
+        if(byId.has(q.id)){
+          if(overwrite && overwrite.checked){ byId.set(q.id,q); }
+        } else { byId.set(q.id,q); }
+      });
+      BANK.questions = Array.from(byId.values());
+      saveAll();
+      alert(`Importadas ${arr.length} preguntas ✅`);
+      renderSubjects();
+    }catch(err){
+      alert("No se pudo importar: "+err.message);
+    } finally {
+      e.target.value="";
+    }
+  });
+}
+
+/* ---------- PWA: registrar SW ---------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      console.log('✅ ServiceWorker registrado:', reg.scope);
+    }).catch(err => {
+      console.log('❌ Error ServiceWorker:', err);
+    });
+  });
+}
+
+/* ---------- Fallback rutas en Vercel estático ---------- */
+if (location.pathname !== "/" && !location.pathname.endsWith("index.html")) {
+  history.replaceState(null, "", "/");
+}
+
+/* ==========================================================
+   MODO EXAMEN – CREÁ EL TUYO (dentro de “Modo práctica”)
+   ========================================================== */
+function renderExamenGeneralSetup(){
+const subs = subjectsFromBank().sort((a, b) => 
+  a.name.replace(/[^\p{L}\p{N} ]/gu, '').localeCompare(
+    b.name.replace(/[^\p{L}\p{N} ]/gu, ''), 'es', {sensitivity:'base'}
+  )
+);
+  const counts = subs.map(s=>{
+    const total = (BANK.questions||[]).filter(q=>q.materia===s.slug).length;
+    return {...s, total};
+  });
+
+  const totalAll = counts.reduce((a,b)=>a+b.total,0);
+
+  // Lista de materias con emoji (viene incluido en s.name)
+  const checks = counts.map(s=>`
+    <label class="chk-mat" style="display:block;margin:4px 0;">
+      <input type="checkbox" class="mat-check" value="${s.slug}" data-count="${s.total}" ${s.total?'checked':''}>
+      ${s.name} <span style="color:var(--muted)">(${s.total})</span>
+    </label>
+  `).join("");
+
+  app.innerHTML = `
+    <div class="card" style="max-width:700px;margin:auto;">
+      <h2>${String.fromCodePoint(0x1F9E0)} Modo Examen – Creá el tuyo</h2>
+      <p>Tenés <b>${totalAll}</b> preguntas disponibles en total.</p>
+      <div id="matList">${checks || "<div class='small'>No hay materias cargadas.</div>"}</div>
+
+      <div style="margin-top:10px;">
+        <label for="numPreg" class="small">Número de preguntas:</label>
+        <input id="numPreg" type="number" min="1" value="${totalAll}" max="${totalAll}" style="width:90px;margin-left:6px;">
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+        <button class="btn-main" onclick="startExamenGeneral()">${String.fromCodePoint(0x1F3AF)} Comenzar examen</button>
+        <button class="btn-small" onclick="renderHome()">${String.fromCodePoint(0x2B05)} Volver al inicio</button>
+      </div>
+    </div>
+  `;
+
+  // Detecta cambios de selección de materias y actualiza número total automáticamente
+  document.querySelectorAll('.mat-check').forEach(chk=>{
+    chk.addEventListener('change', updateExamenCount);
+  });
+}
+function updateExamenCount(){
+  const chks = Array.from(document.querySelectorAll('.mat-check'));
+  const total = chks.filter(c=>c.checked).reduce((a,c)=>a+parseInt(c.dataset.count),0);
+  const numInput=document.getElementById('numPreg');
+  if(!numInput) return;
+  if(!numInput._manual){ numInput.value= Math.max(1,total||1); numInput.max = Math.max(1,total||1); }
+}
+document.addEventListener('input',e=>{ if(e.target && e.target.id==='numPreg') e.target._manual=true; });
+
+function startExamenGeneral(){
+  const chks = Array.from(document.querySelectorAll('.mat-check'));
+  const selected = chks.filter(c=>c.checked).map(c=>c.value);
+  const numEl = document.getElementById('numPreg');
+  const num = Math.max(1, parseInt(numEl?.value||'1',10));
+
+  let pool = (BANK.questions||[]).filter(q=> selected.includes(q.materia));
+  if(pool.length===0){ 
+    alert("Seleccioná al menos una materia con preguntas."); 
+    return; 
+  }
+
+  pool.sort(()=>Math.random()-0.5);
+  const chosen = pool.slice(0, Math.min(num, pool.length));
+
+  CURRENT = { list: chosen, i: 0, modo: 'examen', materia: 'general', session: {} };
+
+    // 🧹 Limpiamos cualquier cronómetro previo
+  clearExamTimer();
+
+  // 🖼️ Renderizamos la primera pregunta
+  renderQuestionWithSidebar(true);
+
+  // 🕒 Crear el botón del cronómetro justo después del render
+  setTimeout(initExamTimer, 50);
+  
+  // ---------- Notas personales ----------
+window.toggleNote = (qid)=>{
+  const area = document.getElementById(`noteArea-${qid}`);
+  const disp = document.getElementById(`noteDisplay-${qid}`);
+  if(!area) return;
+  const visible = !area.classList.contains("hidden");
+  if(visible){
+    area.classList.add("hidden");
+    if(disp) disp.style.display = "";
+  } else {
+    area.classList.remove("hidden");
+    if(disp) disp.style.display = "none";
+  }
+};
+
+window.saveNote = (qid)=>{
+  const txt = document.getElementById(`noteText-${qid}`)?.value.trim();
+  const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
+  if(txt){
+    NOTES[qid] = { text: txt, date: new Date().toISOString() };
+  } else {
+    delete NOTES[qid];
+  }
+  localStorage.setItem("mebank_notes", JSON.stringify(NOTES));
+  alert("✅ Nota guardada");
+  renderQuestionWithSidebar(!document.getElementById('sidebar')?.classList.contains('closed'));
+};
+  /* ---------- MIS NOTAS (visor general) ---------- */
+function renderNotesList(filterMateria = "todas"){
+  const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
+  const keys = Object.keys(NOTES);
+  if(!keys.length){
+    app.innerHTML = `<div class='card' style='text-align:center'>
+      <h3>📔 Mis notas</h3>
+      <p>No tenés notas guardadas todavía.</p>
+      <button class='btn-main' onclick='renderHome()'>Volver</button>
+    </div>`;
+    return;
+  }
+
+  // Obtener materias únicas con notas
+  const materias = [...new Set(
+    keys.map(k => (BANK.questions.find(q => q.id===k)?.materia) || "sin_materia")
+  )].sort();
+
+  // Selector de filtro
+  const selector = `
+    <div style='margin-bottom:12px;text-align:center;'>
+      <label for='selMateria'>Filtrar por materia:</label>
+      <select id='selMateria' onchange='renderNotesList(this.value)' style='margin-left:6px;padding:4px 6px;border-radius:6px;'>
+        <option value='todas' ${filterMateria==="todas"?"selected":""}>Todas</option>
+        ${materias.map(m => `<option value='${m}' ${filterMateria===m?"selected":""}>${m.toUpperCase()}</option>`).join("")}
+      </select>
+    </div>`;
+
+  // Construir lista filtrada
+  const list = keys
+    .map(k => {
+      const n = NOTES[k];
+      const q = (BANK.questions||[]).find(x => x.id===k);
+      const materia = q?.materia || "sin_materia";
+      if(filterMateria !== "todas" && materia !== filterMateria) return "";
+      const title = q ? `${materia.toUpperCase()} – ${q.enunciado.slice(0,80)}...` : k;
+      const date = new Date(n.date).toLocaleDateString("es-AR");
+      return `
+        <div class='card' style='margin-bottom:10px;'>
+          <b>${title}</b><br>
+          <div style='color:var(--muted);font-size:13px;margin:4px 0;'>${date}</div>
+          <div style='white-space:pre-wrap;margin-top:6px;'>${n.text}</div>
+          <div style='text-align:right;margin-top:8px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;'>
+            <button class='btn-small' onclick='goToNote("${k}")'>📖 Ir a pregunta</button>
+            <button class='btn-small' onclick='deleteNote("${k}")'>🗑️ Borrar</button>
+          </div>
+        </div>`;
+    })
+    .join("");
+
+  app.innerHTML = `
+    <div class='fade'>
+      <h3 style='text-align:center;'>📔 Mis notas (${keys.length})</h3>
+      ${selector}
+      ${list || "<p style='text-align:center;color:var(--muted)'>No hay notas en esta materia.</p>"}
+      <div style='text-align:center;margin-top:16px;'>
+        <button class='btn-main' onclick='renderHome()'>Volver al inicio</button>
+      </div>
+    </div>`;
+}
+function deleteNote(id){
+  if(confirm("¿Eliminar esta nota?")){
+    const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
+    delete NOTES[id];
+    localStorage.setItem("mebank_notes", JSON.stringify(NOTES));
+    renderNotesList();
+  }
+}
+  function goToNote(id){
+  const q = (BANK.questions||[]).find(x=>x.id===id);
+  if(!q){ alert("Pregunta no encontrada."); return; }
+  CURRENT = {
+    list: BANK.questions.filter(qq=>qq.materia===q.materia).sort((a,b)=>a.id.localeCompare(b.id)),
+    i: BANK.questions.filter(qq=>qq.materia===q.materia).findIndex(qq=>qq.id===q.id),
+    materia: q.materia,
+    session: {}
+  };
+  renderQuestionWithSidebar(true);
+}
+  /* ---------- Cronómetro modo examen ---------- */
+let examTimer = null;
+let examSeconds = 0;
+
+function initExamTimer() {
+  // Crea el botón flotante si no existe
+  if (document.getElementById("timerBtn")) return;
+
+  const btn = document.createElement("button");
+  btn.id = "timerBtn";
+  btn.className = "timer-toggle";
+  btn.textContent = "⏱️ Encender";
+  btn.onclick = toggleExamTimer;
+  document.body.appendChild(btn);
+}
+
+function toggleExamTimer() {
+  const btn = document.getElementById("timerBtn");
+  if (!btn) return;
+
+  if (examTimer) {
+    // 🔴 Detener
+    clearInterval(examTimer);
+    examTimer = null;
+    localStorage.setItem("mebank_exam_timer", examSeconds);
+    btn.textContent = "⏱️ Encender";
+  } else {
+    // 🟢 Iniciar
+    const saved = parseInt(localStorage.getItem("mebank_exam_timer") || "0", 10);
+    examSeconds = isNaN(saved) ? 0 : saved;
+    updateExamTimerDisplay();
+    examTimer = setInterval(() => {
+      examSeconds++;
+      updateExamTimerDisplay();
+      localStorage.setItem("mebank_exam_timer", examSeconds);
+    }, 1000);
+  }
+}
+
+function updateExamTimerDisplay() {
+  const btn = document.getElementById("timerBtn");
+  if (!btn) return;
+  const h = String(Math.floor(examSeconds / 3600)).padStart(2, "0");
+  const m = String(Math.floor((examSeconds % 3600) / 60)).padStart(2, "0");
+  const s = String(examSeconds % 60).padStart(2, "0");
+  btn.textContent = `⏱️ ${h}:${m}:${s}`;
+}
+
+function clearExamTimer() {
+  // Borra el temporizador y su almacenamiento
+  clearInterval(examTimer);
+  examTimer = null;
+  examSeconds = 0;
+  localStorage.removeItem("mebank_exam_timer");
+  const btn = document.getElementById("timerBtn");
+  if (btn) btn.remove();
+}
 </script>
 </body>
 </html>
