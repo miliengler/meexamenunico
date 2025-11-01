@@ -94,31 +94,7 @@ body[data-theme="dark"]{
   display:flex; align-items:center; justify-content:center; box-shadow:0 6px 24px rgba(2,6,23,.18);
 }
 .theme-toggle:hover{ background:var(--brand-dark) }
-  
-/* Cronómetro flotante */
-.timer-toggle {
-  position: fixed;
-  right: 16px;
-  bottom: 72px; /* un poco arriba del botón 🌙 */
-  z-index: 50;
-  width: 110px;
-  height: 46px;
-  border-radius: 999px;
-  background: var(--brand);
-  color: #fff;
-  border: 1px solid var(--brand);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 6px 24px rgba(2,6,23,.18);
-  transition: background 0.2s ease;
-}
-.timer-toggle:hover {
-  background: var(--brand-dark);
-}
-  
+
 /* Checkboxes en “Creá tu examen” */
 .chk-mat input[type="checkbox"] {
   transform: scale(1.2);
@@ -248,10 +224,7 @@ const app=document.getElementById("app");
 
 /* ---------- HOME ---------- */
 
-  
   function renderHome(){
-  clearExamTimer(); // Apaga cronómetro si estaba activo
-
   app.innerHTML = `
     <div style="text-align:center;animation:fadeIn .5s;display:flex;flex-direction:column;align-items:center;gap:10px;">
       <button class="btn-main" onclick="renderSubjects()">${String.fromCodePoint(0x1F9E9)} Choice por materia</button>
@@ -274,8 +247,6 @@ function resetBanco(){
     location.reload();
   }
 }
-  console.log("✅ Script llegó hasta renderHome()");
-alert("✅ Script llegó hasta renderHome()");
 renderHome();
 
 function renderOld(){
@@ -396,21 +367,14 @@ function renderQuestionWithSidebar(open=true){
     const st = prog[qq.id]?.status;
     return st==='ok' ? 'ok' : st==='bad' ? 'bad' : 'none';
   });
-  
-  const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
-const sideBtns = states.map((st,ix)=>{
-  const qq = CURRENT.list[ix];
-  const hasNote = !!NOTES[qq.id];
-  const cls = (st==='ok'?'ok': st==='bad'?'bad':'');
-  const cur = (ix===CURRENT.i) ? 'cur' : '';
-  const icon = hasNote ? '📎' : '';
-  return `<button class="side-btn ${cls} ${cur}" onclick="jump(${ix})">${ix+1}${icon}</button>`;
-}).join('');
+  const sideBtns = states.map((st,ix)=>{
+    const cls = (st==='ok'?'ok': st==='bad'?'bad':'');
+    const cur = (ix===CURRENT.i) ? 'cur' : '';
+    return `<button class="side-btn ${cls} ${cur}" onclick="jump(${ix})">${ix+1}</button>`;
+  }).join('');
   const notaGuardada = JSON.parse(localStorage.getItem("mebank_notes") || "{}")[q.id]?.text || "";
 const showNotes = ans != null; // solo mostrar si ya respondió
 
-
-  
 const side = `
   <div id="sidebar" class="sidebar ${open ? '' : 'closed'}">
     <div class="side-header">
@@ -795,27 +759,13 @@ function startExamenGeneral(){
   const selected = chks.filter(c=>c.checked).map(c=>c.value);
   const numEl = document.getElementById('numPreg');
   const num = Math.max(1, parseInt(numEl?.value||'1',10));
-
   let pool = (BANK.questions||[]).filter(q=> selected.includes(q.materia));
-  if(pool.length===0){ 
-    alert("Seleccioná al menos una materia con preguntas."); 
-    return; 
-  }
-
+  if(pool.length===0){ alert("Seleccioná al menos una materia con preguntas."); return; }
   pool.sort(()=>Math.random()-0.5);
   const chosen = pool.slice(0, Math.min(num, pool.length));
-
   CURRENT = { list: chosen, i: 0, modo: 'examen', materia: 'general', session: {} };
-
-    // 🧹 Limpiamos cualquier cronómetro previo
-  clearExamTimer();
-
-  // 🖼️ Renderizamos la primera pregunta
   renderQuestionWithSidebar(true);
-
-  // 🕒 Crear el botón del cronómetro justo después del render
-  setTimeout(initExamTimer, 50);
-  
+}
   // ---------- Notas personales ----------
 window.toggleNote = (qid)=>{
   const area = document.getElementById(`noteArea-${qid}`);
@@ -844,7 +794,7 @@ window.saveNote = (qid)=>{
   renderQuestionWithSidebar(!document.getElementById('sidebar')?.classList.contains('closed'));
 };
   /* ---------- MIS NOTAS (visor general) ---------- */
-function renderNotesList(filterMateria = "todas"){
+function renderNotesList(){
   const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
   const keys = Object.keys(NOTES);
   if(!keys.length){
@@ -856,53 +806,33 @@ function renderNotesList(filterMateria = "todas"){
     return;
   }
 
-  // Obtener materias únicas con notas
-  const materias = [...new Set(
-    keys.map(k => (BANK.questions.find(q => q.id===k)?.materia) || "sin_materia")
-  )].sort();
-
-  // Selector de filtro
-  const selector = `
-    <div style='margin-bottom:12px;text-align:center;'>
-      <label for='selMateria'>Filtrar por materia:</label>
-      <select id='selMateria' onchange='renderNotesList(this.value)' style='margin-left:6px;padding:4px 6px;border-radius:6px;'>
-        <option value='todas' ${filterMateria==="todas"?"selected":""}>Todas</option>
-        ${materias.map(m => `<option value='${m}' ${filterMateria===m?"selected":""}>${m.toUpperCase()}</option>`).join("")}
-      </select>
-    </div>`;
-
-  // Construir lista filtrada
-  const list = keys
-    .map(k => {
-      const n = NOTES[k];
-      const q = (BANK.questions||[]).find(x => x.id===k);
-      const materia = q?.materia || "sin_materia";
-      if(filterMateria !== "todas" && materia !== filterMateria) return "";
-      const title = q ? `${materia.toUpperCase()} – ${q.enunciado.slice(0,80)}...` : k;
-      const date = new Date(n.date).toLocaleDateString("es-AR");
-      return `
-        <div class='card' style='margin-bottom:10px;'>
-          <b>${title}</b><br>
-          <div style='color:var(--muted);font-size:13px;margin:4px 0;'>${date}</div>
-          <div style='white-space:pre-wrap;margin-top:6px;'>${n.text}</div>
-          <div style='text-align:right;margin-top:8px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;'>
-            <button class='btn-small' onclick='goToNote("${k}")'>📖 Ir a pregunta</button>
-            <button class='btn-small' onclick='deleteNote("${k}")'>🗑️ Borrar</button>
-          </div>
-        </div>`;
-    })
-    .join("");
+  // Arma la lista de notas
+  const list = keys.map(k=>{
+    const n = NOTES[k];
+    const q = (BANK.questions||[]).find(x=>x.id===k);
+    const title = q ? `${q.materia.toUpperCase()} – ${q.enunciado.slice(0,80)}...` : k;
+    const date = new Date(n.date).toLocaleDateString("es-AR");
+    return `
+      <div class='card' style='margin-bottom:10px;'>
+        <b>${title}</b><br>
+        <div style='color:var(--muted);font-size:13px;margin:4px 0;'>${date}</div>
+        <div style='white-space:pre-wrap;margin-top:6px;'>${n.text}</div>
+        <div style='text-align:right;margin-top:8px;'>
+          <button class='btn-small' onclick='deleteNote("${k}")'>🗑️ Borrar</button>
+        </div>
+      </div>`;
+  }).join("");
 
   app.innerHTML = `
     <div class='fade'>
       <h3 style='text-align:center;'>📔 Mis notas (${keys.length})</h3>
-      ${selector}
-      ${list || "<p style='text-align:center;color:var(--muted)'>No hay notas en esta materia.</p>"}
+      ${list}
       <div style='text-align:center;margin-top:16px;'>
         <button class='btn-main' onclick='renderHome()'>Volver al inicio</button>
       </div>
     </div>`;
 }
+
 function deleteNote(id){
   if(confirm("¿Eliminar esta nota?")){
     const NOTES = JSON.parse(localStorage.getItem("mebank_notes") || "{}");
@@ -910,74 +840,6 @@ function deleteNote(id){
     localStorage.setItem("mebank_notes", JSON.stringify(NOTES));
     renderNotesList();
   }
-}
-  function goToNote(id){
-  const q = (BANK.questions||[]).find(x=>x.id===id);
-  if(!q){ alert("Pregunta no encontrada."); return; }
-  CURRENT = {
-    list: BANK.questions.filter(qq=>qq.materia===q.materia).sort((a,b)=>a.id.localeCompare(b.id)),
-    i: BANK.questions.filter(qq=>qq.materia===q.materia).findIndex(qq=>qq.id===q.id),
-    materia: q.materia,
-    session: {}
-  };
-  renderQuestionWithSidebar(true);
-}
-  /* ---------- Cronómetro modo examen ---------- */
-let examTimer = null;
-let examSeconds = 0;
-
-function initExamTimer() {
-  // Crea el botón flotante si no existe
-  if (document.getElementById("timerBtn")) return;
-
-  const btn = document.createElement("button");
-  btn.id = "timerBtn";
-  btn.className = "timer-toggle";
-  btn.textContent = "⏱️ Encender";
-  btn.onclick = toggleExamTimer;
-  document.body.appendChild(btn);
-}
-
-function toggleExamTimer() {
-  const btn = document.getElementById("timerBtn");
-  if (!btn) return;
-
-  if (examTimer) {
-    // 🔴 Detener
-    clearInterval(examTimer);
-    examTimer = null;
-    localStorage.setItem("mebank_exam_timer", examSeconds);
-    btn.textContent = "⏱️ Encender";
-  } else {
-    // 🟢 Iniciar
-    const saved = parseInt(localStorage.getItem("mebank_exam_timer") || "0", 10);
-    examSeconds = isNaN(saved) ? 0 : saved;
-    updateExamTimerDisplay();
-    examTimer = setInterval(() => {
-      examSeconds++;
-      updateExamTimerDisplay();
-      localStorage.setItem("mebank_exam_timer", examSeconds);
-    }, 1000);
-  }
-}
-
-function updateExamTimerDisplay() {
-  const btn = document.getElementById("timerBtn");
-  if (!btn) return;
-  const h = String(Math.floor(examSeconds / 3600)).padStart(2, "0");
-  const m = String(Math.floor((examSeconds % 3600) / 60)).padStart(2, "0");
-  const s = String(examSeconds % 60).padStart(2, "0");
-  btn.textContent = `⏱️ ${h}:${m}:${s}`;
-}
-
-function clearExamTimer() {
-  // Borra el temporizador y su almacenamiento
-  clearInterval(examTimer);
-  examTimer = null;
-  examSeconds = 0;
-  localStorage.removeItem("mebank_exam_timer");
-  const btn = document.getElementById("timerBtn");
-  if (btn) btn.remove();
 }
 </script>
 </body>
