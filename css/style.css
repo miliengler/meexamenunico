@@ -1,0 +1,369 @@
+/* ==========================================================
+   🌈 VARIABLES DE COLOR Y CONFIGURACIÓN GLOBAL
+   ========================================================== */
+:root {
+  --bg: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --soft: #f1f5f9;
+  --line: #e2e8f0;
+  --brand: #2563eb;
+  --brand-dark: #1e40af;
+  --accent: #22c55e;
+  --danger: #ef4444;
+  --card: #ffffff;
+}
+
+/* ==========================================================
+   🧱 RESET + BASE STRUCTURE
+   ========================================================== */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ---------- CONTENEDORES ---------- */
+.wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ---------- CABECERA Y PIE ---------- */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--card);
+  box-shadow: 0 6px 24px rgba(2,6,23,.08);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  padding: 14px 0;
+}
+.brand h1 {
+  margin: 0;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 700;
+  color: var(--brand-dark);
+}
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 20px;
+}
+
+/* ==========================================================
+   🧭 BOTONES
+   ========================================================== */
+button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: .2s background, .2s transform;
+}
+button:hover { transform: translateY(-2px); }
+
+.btn-main {
+  background: var(--brand);
+  color: #fff;
+  width: 100%;
+  max-width: 360px;
+  margin: 8px auto;
+  display: block;
+  text-align: center;
+  border-color: var(--brand);
+}
+.btn-main:hover { background: var(--brand-dark); }
+
+/* ---------- Variante gris ---------- */
+.btn-main.btn-grey {
+  background: #475569;
+  border-color: #334155;
+}
+
+.btn-small {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 14px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-small:hover { background: #f1f5f9; }
+
+/* ==========================================================
+   🧩 TARJETAS Y TEXTO
+   ========================================================== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 24px rgba(2,6,23,.08);
+}
+
+.small { font-size: 13px; color: var(--muted); }
+
+/* ==========================================================
+   ✨ ANIMACIONES
+   ========================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade { animation: fadeIn 0.3s ease; }
+
+/* ==========================================================
+   🧩 CHOICE POR MATERIA – Estilo limpio y alineado
+   ========================================================== */
+.choice-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.choice-header-global {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.choice-header-global h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+
+.choice-subtitle {
+  margin: 4px 0 18px 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ---------- Materias ---------- */
+.choice-item {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 6px;
+  transition: background 0.15s ease;
+}
+.choice-item:hover { background: #f8fafc; }
+
+.choice-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 2px;
+}
+
+.choice-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.choice-count {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Panel desplegable ---------- */
+.choice-body {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin: 6px 0 12px;
+  padding: 10px 12px;
+  animation: fadeIn 0.2s ease;
+}
+
+.choice-body label {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.choice-body input {
+  width: 70px;
+  padding: 4px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  background: #fff;
+}
+
+/* ---------- Botones ---------- */
+.choice-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.choice-buttons button,
+.btn-practica,
+.btn-repaso,
+.btn-notas {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background 0.2s ease, transform 0.1s;
+}
+
+.choice-buttons button:hover,
+.btn-practica:hover,
+.btn-repaso:hover,
+.btn-notas:hover {
+  background: #e2e8f0 !important;
+  transform: translateY(-1px);
+}
+/* ==========================================================
+   📐 Estilo limpio dentro del desplegable
+   ========================================================== */
+.choice-count {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 2px 0 8px 2px;
+}
+
+.choice-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.choice-row label {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.choice-row input {
+  width: 70px;
+  padding: 4px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  text-align: center;
+}
+/* ==========================================================
+   📊 Estilo de contador de preguntas
+   ========================================================== */
+.choice-count {
+  color: var(--muted);
+  font-weight: 600;      /* negrita */
+  font-size: 11px;       /* un poco más chico que “Desde” */
+  margin: 1px 0 6px 2px;
+}
+/* ==========================================================
+   🟢 Estilo del componente de progreso circular
+   ========================================================== */
+.progress-ring {
+  position: relative;
+  display: inline-block;
+}
+
+.progress-ring svg {
+  transform: rotate(-90deg);
+}
+
+.progress-bg {
+  stroke-linecap: round;
+}
+
+.progress-value {
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  user-select: none;
+}
+/* ==========================================================
+   🧭 Selector de orden – Choice
+   ========================================================== */
+.sort-control {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.sort-control select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--text);
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s background;
+}
+
+.sort-control select:hover {
+  background: #e2e8f0;
+}
+/* ==========================================================
+   💫 Animación elegante de reordenamiento en Choice
+   ========================================================== */
+.animated-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.choice-item {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fadeSlideIn 0.35s ease forwards;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* 🔄 Transición al cambiar el orden */
+.fade-out {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.25s ease;
+}
