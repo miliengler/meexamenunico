@@ -1,0 +1,67 @@
+/* ==========================================================
+   📱 Layout Mobile – Optimización táctil y responsive
+   ========================================================== */
+
+@media (max-width: 768px) {
+
+  /* ---------- Ajustes generales ---------- */
+  body {
+    font-size: 17px;
+    line-height: 1.6;
+    padding: 0 10px;
+  }
+
+  .q-layout {
+    flex-direction: column;
+    padding-right: 0 !important;
+    gap: 12px;
+  }
+
+  .q-card {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-size: 17px;
+  }
+
+  .q-card .enunciado {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  /* ---------- Opciones táctiles ---------- */
+  .q-card .options label {
+    padding: 14px 16px;
+    font-size: 16px;
+  }
+
+  /* ---------- Botonera ---------- */
+  .nav-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .btn-small, .btn-main {
+    width: 100%;
+    max-width: none;
+    font-size: 16px;
+    padding: 12px 0;
+  }
+
+  /* ---------- Sidebar oculto en móvil ---------- */
+  #exam-sidebar,
+  #openSidebarBtn {
+    display: none !important;
+  }
+
+  /* ---------- Header y footer ---------- */
+  .header, .footer {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .brand h1 {
+    font-size: 20px;
+  }
+}
